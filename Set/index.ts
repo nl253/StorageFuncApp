@@ -13,7 +13,7 @@ import {BlockBlobTier} from "@azure/storage-blob";
 import {Context, HttpRequest} from "@azure/functions";
 
 const setBlob = async (key: string, val: any, headers: Headers = {}): Promise<void> => {
-  const container = getBlobContainer(process.env.REACT_APP_BLOB_CONTAINER);
+  const container = getBlobContainer(process.env.BLOB_CONTAINER);
   const blobHTTPHeaders = {
     blobCacheControl: headers["cache-control"],
     blobContentDisposition: headers["content-disposition"],

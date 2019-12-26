@@ -99,11 +99,11 @@ const validateJSON = (context: Context, schema: Record<string, any>, what: "body
 
 const getBlobContainer = async (containerName: string): Promise<ContainerClient> => {
   const sharedKeyCredential = new StorageSharedKeyCredential(
-    process.env.REACT_APP_BLOB_ACCOUNT,
-    process.env.REACT_APP_BLOB_ACCOUNT_KEY,
+    process.env.BLOB_ACCOUNT,
+    process.env.BLOB_ACCOUNT_KEY,
   );
   const blobStorage = new BlobServiceClient(
-    `https://${process.env.REACT_APP_BLOB_ACCOUNT}.blob.core.windows.net`,
+    `https://${process.env.BLOB_ACCOUNT}.blob.core.windows.net`,
     sharedKeyCredential,
     {
       retryOptions: {

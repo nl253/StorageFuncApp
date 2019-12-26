@@ -11,7 +11,7 @@ import {
 import {Context} from "@azure/functions";
 
 const getBlob = async (key: string): Promise<{ res: string, headers: Headers }> => {
-  const container = await getBlobContainer(process.env.REACT_APP_BLOB_CONTAINER);
+  const container = await getBlobContainer(process.env.BLOB_CONTAINER);
   const blob = container.getBlockBlobClient(key);
   const propertiesPromise = blob.getProperties();
   const res = await blob.download(0, undefined, {maxRetryRequests: 3});

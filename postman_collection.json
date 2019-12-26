@@ -9,18 +9,15 @@
 		{
 			"name": "Get",
 			"request": {
-				"auth": {
-					"type": "noauth"
-				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/get/tsconfig",
+					"raw": "{{baseUrl}}/Get/tsconfig",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"get",
+						"Get",
 						"tsconfig"
 					]
 				},
@@ -197,9 +194,6 @@
 		{
 			"name": "Set",
 			"request": {
-				"auth": {
-					"type": "noauth"
-				},
 				"method": "POST",
 				"header": [
 					{
@@ -412,9 +406,46 @@
 			]
 		}
 	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{apiKey}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "Authorization",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "579dcbb2-0ae8-4f69-afb1-6d70f7b85f42",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "78887997-0d69-4b6f-ba91-4500a7f7d0e5",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"id": "baseUrl",
+			"id": "8ec6c52e-9bd5-48d9-8511-00d1c2fb5d56",
 			"key": "baseUrl",
 			"value": "//storage-apim.azure-api.net",
 			"type": "string"
