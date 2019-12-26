@@ -1,26 +1,26 @@
-import {Context} from '@azure/functions';
+import {Context} from "@azure/functions";
 
-import * as Ajv from 'ajv';
 import {
   BlobServiceClient,
   ContainerClient,
   StorageRetryPolicyType,
   StorageSharedKeyCredential,
-} from '@azure/storage-blob';
+} from "@azure/storage-blob";
+import * as Ajv from "ajv";
 
 type Headers = Record<string, string>;
 type Response = any;
 
 const JSON_HEADER = {
-  'content-type': 'application/json',
+  "content-type": "application/json",
 };
 
 const TEXT_HEADER = {
-  'content-type': 'text/plain',
+  "content-type": "text/plain",
 };
 
 const CACHE_HEADER = {
-  'cache-control': 'private, immutable',
+  "cache-control": "private, immutable",
 };
 
 const HTTP_ERR = {
@@ -31,19 +31,18 @@ const HTTP_ERR = {
 class APIError extends Error {
   public readonly code: number;
 
-  constructor(msg: string = 'something went wrong', code: number = HTTP_ERR.USER_ERR) {
+  constructor(msg: string = "something went wrong", code: number = HTTP_ERR.USER_ERR) {
     super(msg);
     this.code = code;
   }
 }
 
 const logStart = (context: Context): void => {
-  context.log('[Node.js HTTP %s FuncApp] %s', context.req.method, context.req.url);
-  context.log('binding data', context.bindingData ? JSON.stringify(context.bindingData).substr(0, 200) : 'undefined');
-  context.log('body %s', context.req.body ? JSON.stringify(context.req.body).substr(0, 200) : 'undefined');
-  context.log('query %s', JSON.stringify(context.req.query).substr(0, 200));
+  context.log("[Node.js HTTP %s FuncApp] %s", context.req.method, context.req.url);
+  context.log("binding data", context.bindingData ? JSON.stringify(context.bindingData).substr(0, 200) : "undefined");
+  context.log("body %s", context.req.body ? JSON.stringify(context.req.body).substr(0, 200) : "undefined");
+  context.log("query %s", JSON.stringify(context.req.query).substr(0, 200));
 };
-
 
 const makeLogger = (context: Context) => ({
   log(...xs: any[]): void {
@@ -54,7 +53,7 @@ const makeLogger = (context: Context) => ({
   },
   error(...xs: any[]): void {
     return context.log.error(...xs);
-  }
+  },
 });
 
 const succeed = (context: Context, body: Response, headers: Headers = { ...CACHE_HEADER, ...JSON_HEADER }, status: number = 200): Response => {
@@ -74,7 +73,7 @@ const fail = (context: Context, msg: string, status: number = 400, headers: Head
   };
 };
 
-const validateJSON = (context: Context, schema: Record<string, any>, what: 'body' | 'query' = 'body'): void => {
+const validateJSON = (context: Context, schema: Record<string, any>, what: "body" | "query" = "body"): void => {
   if (context.req[what] === null || context.req[what] === undefined) {
     throw new APIError(`${what} is missing from the request`, HTTP_ERR.USER_ERR);
   }
@@ -88,13 +87,13 @@ const validateJSON = (context: Context, schema: Record<string, any>, what: 'body
     $schema: "http://json-schema.org/draft-07/schema#",
     $id: schema.$id || schema.description,
     description: schema.description || schema.$id,
-    ...schema
+    ...schema,
   });
   const valid = validate(context.req[what]);
   if (!valid) {
     context.log(validate);
     context.log(validate.errors[0].params);
-    throw new APIError(validate.errors.map(e => `${e.dataPath} ${e.message} ${e.params ? JSON.stringify(e.params) : ''}`).join(', '), HTTP_ERR.USER_ERR);
+    throw new APIError(validate.errors.map((e) => `${e.dataPath} ${e.message} ${e.params ? JSON.stringify(e.params) : ""}`).join(", "), HTTP_ERR.USER_ERR);
   }
 };
 
@@ -113,7 +112,7 @@ const getBlobContainer = async (containerName: string): Promise<ContainerClient>
         retryDelayInMs: 50,
         retryPolicyType: StorageRetryPolicyType.EXPONENTIAL,
         tryTimeoutInMs: 5000,
-      }
+      },
     });
   const container = blobStorage.getContainerClient(containerName);
   if (!(await container.exists())) {
@@ -122,10 +121,10 @@ const getBlobContainer = async (containerName: string): Promise<ContainerClient>
   return container;
 };
 
-const streamToString: (any) => Promise<string> = readableStream => new Promise((resolve, reject) => {
+const streamToString: (readonly: any) => Promise<string> = (readableStream) => new Promise((resolve, reject) => {
   const chunks = [];
   readableStream.on("data", (data) => chunks.push(data.toString()));
-  readableStream.on("end", () => resolve(chunks.join('')));
+  readableStream.on("end", () => resolve(chunks.join("")));
   readableStream.on("error", reject);
 });
 
