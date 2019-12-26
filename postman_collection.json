@@ -462,7 +462,7 @@
 				"id": "78887997-0d69-4b6f-ba91-4500a7f7d0e5",
 				"type": "text/javascript",
 				"exec": [
-					"pm.test(\"Status code is OK\",  () => {",
+					"pm.test(\"Status code is OK\", () => {",
 					"    pm.response.to.be.ok;",
 					"});",
 					"",

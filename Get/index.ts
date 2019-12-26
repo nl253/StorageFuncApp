@@ -10,8 +10,8 @@ import {
 
 import {Context} from "@azure/functions";
 
-const getBlob = async (key: string): Promise<{ res: string, headers: Headers }> => {
-  const container = await getBlobContainer(process.env.BLOB_CONTAINER);
+const getBlob = async (key: string, containerName: string): Promise<{ res: string, headers: Headers }> => {
+  const container = await getBlobContainer(containerName);
   const blob = container.getBlockBlobClient(key);
   const propertiesPromise = blob.getProperties();
   const res = await blob.download(0, undefined, {maxRetryRequests: 3});
@@ -33,7 +33,8 @@ const getBlob = async (key: string): Promise<{ res: string, headers: Headers }> 
 export default async (context: Context): Promise<Response> => {
   logStart(context);
   try {
-    const { res, headers } = await getBlob(context.bindingData.key);
+    const containerName = context.req.headers.authorization || context.req.headers.Authorization;
+    const { res, headers } = await getBlob(context.bindingData.key, containerName);
     return succeed(context, res, {"content-type": "text/plain", ...headers});
   } catch (e) {
     return fail(context, e.message, e.code);
