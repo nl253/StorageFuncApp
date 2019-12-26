@@ -12,12 +12,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/Get/tsconfig",
+					"raw": "{{baseUrl}}/get/tsconfig",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
-						"Get",
+						"get",
 						"tsconfig"
 					]
 				},
@@ -441,14 +441,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"id": "8ec6c52e-9bd5-48d9-8511-00d1c2fb5d56",
-			"key": "baseUrl",
-			"value": "//storage-apim.azure-api.net",
-			"type": "string"
 		}
 	],
 	"protocolProfileBehavior": {}
