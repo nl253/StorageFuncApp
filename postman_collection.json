@@ -8,6 +8,18 @@
 	"item": [
 		{
 			"name": "Get",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "accaa057-62a5-4293-ac39-a41f0551ccb0",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -193,6 +205,18 @@
 		},
 		{
 			"name": "Set",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dd24b207-5fca-44db-aa7d-21ed3e57b5b0",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -438,7 +462,13 @@
 				"id": "78887997-0d69-4b6f-ba91-4500a7f7d0e5",
 				"type": "text/javascript",
 				"exec": [
-					""
+					"pm.test(\"Status code is OK\",  () => {",
+					"    pm.response.to.be.ok;",
+					"});",
+					"",
+					"pm.test(\"Response time is less than 10s\", () => {",
+					"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+					"});"
 				]
 			}
 		}
