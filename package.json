@@ -37,10 +37,12 @@
     "prestart": "npm run build && func extensions install",
     "start:host": "func start --language-worker -- \"--inspect=5858\"",
     "start": "npm-run-all --parallel start:host watch",
+    "test:integration": "npx newman run postman_collection.json -e postman_environment.json",
     "test": "echo \"No tests yet...\""
   },
   "description": "",
   "devDependencies": {
+    "newman": "^4.5.7",
     "tslint": "^5.20.1",
     "@types/node": "^13.1.0",
     "@azure/functions": "^1.0.3",

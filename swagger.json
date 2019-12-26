@@ -47,7 +47,10 @@
             "name": "key",
             "in": "path",
             "type": "string",
-            "required": true
+            "required": true,
+            "description": "",
+            "minLength": 1,
+            "pattern": "[^/]+"
           }
         ],
         "responses": {
@@ -68,7 +71,8 @@
           }
         },
         "produces": [
-          "application/json"
+          "application/json",
+          "text/plain"
         ]
       }
     },
@@ -84,13 +88,26 @@
         ],
         "parameters": [
           {
+            "name": "key",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "",
+            "minLength": 1,
+            "pattern": "[^/]+"
+          },
+          {
             "name": "body",
             "in": "body",
-            "type": "string"
+            "schema": {
+            },
+            "description": "",
+            "required": true
           }
         ],
         "consumes": [
-          "*/*"
+          "text/plain",
+          "application/json"
         ],
         "responses": {
           "200": {
