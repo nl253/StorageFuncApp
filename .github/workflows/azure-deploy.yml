@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - name: 'run npm'
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+    - name: integration test
+      run: 'npm run test:integration'
+    - uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: storage-fa
+        publish-profile: ${{ secrets.ScmCredentials }}

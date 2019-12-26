@@ -1,0 +1,24 @@
+{
+  "version": "2.0",
+  "logging": {
+    "logLevel": {
+      "default": "Information"
+    },
+    "fileLoggingMode": "never",
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "maxTelemetryItemsPerSecond": 2
+      }
+    }
+  },
+  "functionTimeout": "00:02:00",
+  "healthMonitor": {
+    "healthCheckInterval": "00:00:10",
+    "enabled": true
+  },
+  "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[1.*, 2.0.0)"
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Storage",
+    "version": "1.0",
+    "description": "Storage API."
+  },
+  "host": "storage-apim.azure-api.net",
+  "produces": [
+    "application/json",
+    "text/plain"
+  ],
+  "securityDefinitions": {
+    "apiKeyHeader": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "apiKeyQuery": {
+      "type": "apiKey",
+      "name": "api-key",
+      "in": "query"
+    }
+  },
+  "security": [
+    {
+      "apiKeyHeader": [
+      ]
+    },
+    {
+      "apiKeyQuery": []
+    }
+  ],
+  "paths": {
+    "/get/{key}": {
+      "get": {
+        "description": "Get",
+        "operationId": "get-get",
+        "summary": "Get",
+        "tags": [
+          "storage",
+          "download",
+          "blob"
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Text"
+          },
+          "400": {
+            "$ref": "#/responses/Error"
+          },
+          "404": {
+            "$ref": "#/responses/Error"
+          },
+          "502": {
+            "$ref": "#/responses/Error"
+          },
+          "503": {
+            "$ref": "#/responses/Error"
+          }
+        },
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/set/{key}": {
+      "post": {
+        "description": "Set",
+        "operationId": "post-set",
+        "summary": "Set",
+        "tags": [
+          "storage",
+          "upload",
+          "blob"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "type": "string"
+          }
+        ],
+        "consumes": [
+          "*/*"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/Text"
+          },
+          "400": {
+            "$ref": "#/responses/Error"
+          },
+          "404": {
+            "$ref": "#/responses/Error"
+          },
+          "502": {
+            "$ref": "#/responses/Error"
+          },
+          "503": {
+            "$ref": "#/responses/Error"
+          }
+        },
+        "produces": [
+          "application/json"
+        ]
+      }
+    }
+  },
+  "responses": {
+    "Text": {
+      "examples": {
+        "text/plain": "alslkedfj alsdfaslkd falskdf kasdf "
+      },
+      "headers": {
+        "Content-Type": {
+          "type": "string",
+          "enum": ["text/plain"]
+        }
+      },
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Text"
+      }
+    },
+    "Error": {
+      "description": "",
+      "examples": {
+        "200": "something went wrong"
+      },
+      "schema": {
+        "$ref": "#/definitions/Error"
+      },
+      "headers": {
+        "Content-Type": {
+          "enum": ["text/plain"],
+          "type": "string"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Error": {
+      "minLength": 1,
+      "example": "something went wrong",
+      "type": "string",
+      "title": "Error Response"
+    },
+    "Text": {
+      "type": "string",
+      "minLength": 1,
+      "example": "OK"
+    }
+  },
+  "tags": [
+    {
+      "name": "storage",
+      "description": "storage"
+    }
+  ]
+}

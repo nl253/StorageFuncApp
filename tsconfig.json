@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "types": ["node", "@azure/functions"],
+    "module": "commonjs",
+    "target": "es6",
+    "outDir": "dist",
+    "rootDir": ".",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": false
+  }
+}

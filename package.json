@@ -1,0 +1,54 @@
+{
+  "name": "storage-func-ap",
+  "private": true,
+  "author": {
+    "email": "norbertlogiewa96@gmail.com",
+    "name": "Norbert Logiewa",
+    "url": "https://github.com/nl253"
+  },
+  "bugs": {
+    "email": "norbertlogiewa96@gmail.com",
+    "url": "https://github.com/nl253/StorageFuncApp/issues"
+  },
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "engineStrict": true,
+  "browserslist": [],
+  "contributors": [
+    {
+      "email": "norbertlogiewa96@gmail.com",
+      "name": "Norbert Logiewa",
+      "url": "https://github.com/nl253"
+    }
+  ],
+  "directories": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nl253/StorageFuncApp"
+  },
+  "homepage": "https://github.com/nl253/StorageFuncApp",
+  "readme": "https://github.com/nl253/StorageFuncApp/blob/master/README.md",
+  "scripts": {
+    "build": "tsc",
+    "build:production": "npm run prestart && npm prune --production",
+    "watch": "tsc --w",
+    "prestart": "npm run build && func extensions install",
+    "start:host": "func start --language-worker -- \"--inspect=5858\"",
+    "start": "npm-run-all --parallel start:host watch",
+    "test": "echo \"No tests yet...\""
+  },
+  "description": "",
+  "devDependencies": {
+    "tslint": "^5.20.1",
+    "@types/node": "^13.1.0",
+    "@azure/functions": "^1.0.3",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^3.3.3"
+  },
+  "dependencies": {
+    "@azure/storage-blob": "^12.0.1",
+    "ajv": "^6.10.2"
+  }
+}
