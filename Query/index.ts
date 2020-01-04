@@ -41,7 +41,7 @@ const getBlobs = async <T extends Json = Json, K extends Json = Json>(containerN
   const container = await getBlobContainer(containerName);
   if (where === undefined) {
     const promises: Array<Promise<T>> = [];
-    let i = 0;
+    let j = 0;
     for await (const b of container.listBlobsFlat(LIST_OPTIONS)) {
       // @ts-ignore
       // tslint:disable-next-line:radix
@@ -50,10 +50,10 @@ const getBlobs = async <T extends Json = Json, K extends Json = Json>(containerN
       }
       // @ts-ignore
       // tslint:disable-next-line:radix
-      if (i >= parseInt(offset)) {
+      if (j >= parseInt(offset)) {
         promises.push(getBlob(b.name, containerName).then(({ res }): T => JSON.parse(res) as T));
       }
-      i++;
+      j++;
     }
     return await Promise.all(promises);
   }
