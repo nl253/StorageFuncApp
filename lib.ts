@@ -1,17 +1,18 @@
-import {Context} from "@azure/functions";
+/* eslint-disable @typescript-eslint/interface-name-prefix */
+import { Context } from '@azure/functions';
 
 import {
   BlobServiceClient,
   ContainerClient,
   StorageRetryPolicyType,
   StorageSharedKeyCredential,
-} from "@azure/storage-blob";
+} from '@azure/storage-blob';
 
 type StatusOk = 200 | 201 | 202;
 type StatusError = 400 | 401 | 404;
 
 type Headers = Record<string, string>;
-type TypedHeader<K extends string> = Headers & { "content-type": K };
+type TypedHeader<K extends string> = Headers & { 'content-type': K };
 type Json = boolean | null | string | number | Record<string, JSON> | Json[];
 
 interface IHttpResponse<T, S extends number, H extends string> {
@@ -21,24 +22,25 @@ interface IHttpResponse<T, S extends number, H extends string> {
   headers: TypedHeader<H>;
 }
 
-type IHttpTextResponse = IHttpResponse<string, StatusOk, "text/plain">;
-type IHttpJsonResponse<T extends Json = Json> = IHttpResponse<T, StatusOk, "application/json">;
-type IHttpFailure = IHttpResponse<string, StatusError, "text/plain">;
+type IHttpTextResponse = IHttpResponse<string, StatusOk, 'text/plain'>;
+type IHttpJsonResponse<T extends Json = Json> = IHttpResponse<T, StatusOk, 'application/json'>;
+type IHttpFailure = IHttpResponse<string, StatusError, 'text/plain'>;
 
-const JSON_HEADER: TypedHeader<"application/json"> = {
-  "content-type": "application/json",
+const JSON_HEADER: TypedHeader<'application/json'> = {
+  'content-type': 'application/json',
 };
 
-const TEXT_HEADER: TypedHeader<"text/plain"> = {
-  "content-type": "text/plain",
+const TEXT_HEADER: TypedHeader<'text/plain'> = {
+  'content-type': 'text/plain',
 };
 
 const CACHE_HEADER = {
-  "cache-control": "private, immutable",
+  'cache-control': 'private, immutable',
 };
 
 class APIError extends Error {
   public static from(error: Error, code: StatusError = 400): APIError {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     const status = error.code || error.status || error.statusCode || code;
     return new APIError(error.message, status);
@@ -46,21 +48,29 @@ class APIError extends Error {
 
   public readonly code: StatusError;
 
-  protected constructor(msg: string = "something went wrong", code: StatusError) {
+  protected constructor(
+    // eslint-disable-next-line default-param-last
+    msg = 'something went wrong',
+    code: StatusError,
+  ) {
     super(msg);
     this.code = code;
   }
 }
 
 const logStart = (context: Context): void => {
-  context.log("%s %s", context.req.method, context.req.url);
-  context.log("binding data", context.bindingData ? JSON.stringify(context.bindingData).substr(0, 200) : "undefined");
-  context.log("body %s", context.req.body ? JSON.stringify(context.req.body).substr(0, 200) : "undefined");
-  context.log("query %s", context.req.query ? JSON.stringify(context.req.query).substr(0, 200) : "undefined");
+  context.log('%s %s', context.req.method, context.req.url);
+  context.log('binding data', context.bindingData ? JSON.stringify(context.bindingData).substr(0, 200) : 'undefined');
+  context.log('body %s', context.req.body ? JSON.stringify(context.req.body).substr(0, 200) : 'undefined');
+  context.log('query %s', context.req.query ? JSON.stringify(context.req.query).substr(0, 200) : 'undefined');
 };
 
-const succeedJson = <T extends Json>(context: Context, body: T, headers: Headers = {...CACHE_HEADER}, status: StatusOk = 200): IHttpJsonResponse<T> => {
-  return context.res = {
+const succeedJson = <T extends Json>(
+  context: Context,
+  body: T,
+  headers: Headers = { ...CACHE_HEADER },
+  status: StatusOk = 200): IHttpJsonResponse<T> => {
+  const res = {
     body,
     status: status as 200,
     isRaw: true as true,
@@ -69,10 +79,18 @@ const succeedJson = <T extends Json>(context: Context, body: T, headers: Headers
       ...JSON_HEADER,
     },
   };
+  // eslint-disable-next-line no-param-reassign
+  context.res = res;
+  return res;
 };
 
-const succeedText = (context: Context, body: string, headers: Headers = {...CACHE_HEADER}, status: StatusOk = 200): IHttpTextResponse => {
-  return context.res = {
+const succeedText = (
+  context: Context,
+  body: string,
+  headers: Headers = { ...CACHE_HEADER },
+  status: StatusOk = 200,
+): IHttpTextResponse => {
+  const res = {
     body,
     status: status as 200,
     isRaw: true as true,
@@ -81,10 +99,17 @@ const succeedText = (context: Context, body: string, headers: Headers = {...CACH
       ...TEXT_HEADER,
     },
   };
+  // eslint-disable-next-line no-param-reassign
+  context.res = res;
+  return res;
 };
 
-const fail = (context: Context, error: APIError, headers: Headers = {}): IHttpFailure => {
-  return context.res = {
+const fail = (
+  context: Context,
+  error: APIError,
+  headers: Headers = {},
+): IHttpFailure => {
+  const res = {
     status: error.code,
     headers: {
       ...headers,
@@ -93,17 +118,17 @@ const fail = (context: Context, error: APIError, headers: Headers = {}): IHttpFa
     isRaw: true as true,
     body: error.message,
   };
+  // eslint-disable-next-line no-param-reassign
+  context.res = res;
+  return res;
 };
 
 const getBlobContainer = async (containerName: string): Promise<ContainerClient> => {
   const sharedKeyCredential = new StorageSharedKeyCredential(
-    process.env.BLOB_ACCOUNT,
-    process.env.BLOB_ACCOUNT_KEY,
+    process.env.BLOB_ACCOUNT, process.env.BLOB_ACCOUNT_KEY,
   );
   const blobStorage = new BlobServiceClient(
-    `https://${process.env.BLOB_ACCOUNT}.blob.core.windows.net`,
-    sharedKeyCredential,
-    {
+    `https://${process.env.BLOB_ACCOUNT}.blob.core.windows.net`, sharedKeyCredential, {
       retryOptions: {
         maxTries: 3,
         maxRetryDelayInMs: 250,
@@ -111,7 +136,8 @@ const getBlobContainer = async (containerName: string): Promise<ContainerClient>
         retryPolicyType: StorageRetryPolicyType.EXPONENTIAL,
         tryTimeoutInMs: 5000,
       },
-    });
+    },
+  );
   const container = blobStorage.getContainerClient(containerName);
   if (!(await container.exists())) {
     await container.create();
@@ -119,32 +145,38 @@ const getBlobContainer = async (containerName: string): Promise<ContainerClient>
   return container;
 };
 
-const getBlob = async (key: string, containerName: string): Promise<{ res: string, headers: Headers }> => {
+// eslint-disable-next-line arrow-body-style
+const streamToString: (readonly: any) => Promise<string> = (readableStream) => {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    readableStream.on('data', (data) => chunks.push(data.toString()));
+    readableStream.on('end', () => resolve(chunks.join('')));
+    readableStream.on('error', reject);
+  });
+};
+
+const getBlob = async (
+  key: string,
+  containerName: string,
+): Promise<{ res: string; headers: Headers }> => {
   const container = await getBlobContainer(containerName);
   const blob = container.getBlockBlobClient(key);
   const propertiesPromise = blob.getProperties();
-  const res = await blob.download(0, undefined, {maxRetryRequests: 3});
+  const res = await blob.download(0, undefined, { maxRetryRequests: 3 });
   const resString = streamToString(res.readableStreamBody);
   const properties = await propertiesPromise;
   const headers = {
-    "content-disposition": properties.contentDisposition,
-    "cache-control": properties.cacheControl,
-    "content-encoding": properties.contentEncoding,
-    "content-language": properties.contentLanguage,
-    "content-type": properties.contentType,
+    'content-disposition': properties.contentDisposition,
+    'cache-control': properties.cacheControl,
+    'content-encoding': properties.contentEncoding,
+    'content-language': properties.contentLanguage,
+    'content-type': properties.contentType,
   } as Headers;
   return {
     headers,
     res: await resString,
   };
 };
-
-const streamToString: (readonly: any) => Promise<string> = (readableStream) => new Promise((resolve, reject) => {
-  const chunks = [];
-  readableStream.on("data", (data) => chunks.push(data.toString()));
-  readableStream.on("end", () => resolve(chunks.join("")));
-  readableStream.on("error", reject);
-});
 
 export {
   Headers,
@@ -159,8 +191,12 @@ export {
   getBlobContainer,
   streamToString,
   getBlob,
+  // eslint-disable-next-line no-undef
   Json,
+  // eslint-disable-next-line no-undef
   IHttpFailure,
+  // eslint-disable-next-line no-undef
   IHttpJsonResponse,
+  // eslint-disable-next-line no-undef
   IHttpTextResponse,
 };

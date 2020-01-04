@@ -1,4 +1,4 @@
-import {Context} from "@azure/functions";
+import { Context } from '@azure/functions';
 
 import {
   APIError,
@@ -9,12 +9,17 @@ import {
   IHttpTextResponse,
   logStart,
   succeedJson,
-} from "../lib";
+} from '../lib';
 
-export default async (context: Context): Promise<IHttpJsonResponse | IHttpTextResponse | IHttpFailure> => {
+type Response = Promise<IHttpJsonResponse | IHttpTextResponse | IHttpFailure>;
+
+export default async (context: Context): Response => {
   logStart(context);
   try {
-    const { res, headers } = await getBlob(context.bindingData.key, context.req.headers.authorization);
+    const {
+      res,
+      headers,
+    } = await getBlob(context.bindingData.key, context.req.headers.authorization);
     return succeedJson(context, res, headers);
   } catch (e) {
     return fail(context, APIError.from(e));

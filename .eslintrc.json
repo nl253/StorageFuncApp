@@ -1,0 +1,64 @@
+{
+  "env": {
+    "browser": false,
+    "commonjs": true,
+    "es6": true,
+    "jest": true,
+    "node": true,
+    "worker": true
+  },
+  "extends": [
+    "eslint:all",
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:node/recommended",
+    "plugin:security/recommended",
+    "plugin:promise/recommended",
+    "plugin:import/warnings"
+  ],
+  "globals": {
+    "Array": true,
+    "Date": true,
+    "JSON": true,
+    "Map": true,
+    "Math": true,
+    "Number": true,
+    "Object": true,
+    "Promise": true,
+    "Set": true,
+    "URL": true,
+    "document": false,
+    "navigator": false,
+    "process": true,
+    "window": false
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "codeFrame": false,
+    "ecmaFeatures": {
+      "impliedStrict": true,
+      "jsx": false
+    },
+    "ecmaVersion": 10,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "filenames",
+    "import",
+    "promise",
+    "security"
+  ],
+  "root": true,
+  "rules": {
+    "no-restricted-syntax": 0,
+    "node/no-missing-import": 0,
+    "node/no-unpublished-import": 0,
+    "import/extensions": 0,
+    "import/no-unresolved": 0,
+    "node/no-unsupported-features/es-syntax": 0,
+    "node/no-unsupported-features/node-builtins": 0,
+    "function-call-argument-newline": [2, "never"],
+    "linebreak-style": 0,
+    "radix": 0
+  }
+}
