@@ -24,13 +24,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/get/tsconfig",
+					"raw": "{{baseUrl}}/get/{{$guid}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"get",
-						"tsconfig"
+						"{{$guid}}"
 					]
 				},
 				"description": "Get"
@@ -204,6 +204,203 @@
 			]
 		},
 		{
+			"name": "Query",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "accaa057-62a5-4293-ac39-a41f0551ccb0",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/get/tsconfig",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"get",
+						"tsconfig"
+					]
+				},
+				"description": "Get"
+			},
+			"response": [
+				{
+					"name": "Untitled Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/get/:key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"get",
+								":key"
+							],
+							"variable": [
+								{
+									"key": "key"
+								}
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "\"something went wrong\""
+				},
+				{
+					"name": "Untitled Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/get/:key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"get",
+								":key"
+							],
+							"variable": [
+								{
+									"key": "key"
+								}
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "\"something went wrong\""
+				},
+				{
+					"name": "Untitled Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/get/:key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"get",
+								":key"
+							],
+							"variable": [
+								{
+									"key": "key"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "\"OK\""
+				},
+				{
+					"name": "Untitled Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/get/:key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"get",
+								":key"
+							],
+							"variable": [
+								{
+									"key": "key"
+								}
+							]
+						}
+					},
+					"status": "Service Unavailable",
+					"code": 503,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "\"something went wrong\""
+				},
+				{
+					"name": "Untitled Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/get/:key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"get",
+								":key"
+							],
+							"variable": [
+								{
+									"key": "key"
+								}
+							]
+						}
+					},
+					"status": "Bad Gateway",
+					"code": 502,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "\"something went wrong\""
+				}
+			]
+		},
+		{
 			"name": "Set",
 			"event": [
 				{
@@ -211,7 +408,9 @@
 					"script": {
 						"id": "dd24b207-5fca-44db-aa7d-21ed3e57b5b0",
 						"exec": [
-							""
+							"pm.test(\"Status code is OK\",  () => {",
+							"    pm.response.to.be.ok;",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -227,16 +426,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"compilerOptions\": {\r\n    \"types\": [\"node\", \"@azure/functions\"],\r\n    \"module\": \"commonjs\",\r\n    \"target\": \"es6\",\r\n    \"outDir\": \"dist\",\r\n    \"rootDir\": \".\",\r\n    \"resolveJsonModule\": true,\r\n    \"sourceMap\": true,\r\n    \"strict\": false\r\n  }\r\n}\r\n"
+					"raw": "{\n\t\"firstName\": \"{{$randomFirstName}}\",\n\t\"lastName\": \"{{$randomLastName}}\",\n\t\"job\": \"{{$randomJobTitle}}\",\n\t\"phoneNumber\": \"{{$randomPhoneNumber}}\",\n\t\"gender\": \"{{$randomBoolean}}\"\n}"
 				},
 				"url": {
-					"raw": "{{baseUrl}}/set/tsconfig",
+					"raw": "{{baseUrl}}/set/{{$randomEmail}}",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"set",
-						"tsconfig"
+						"{{$randomEmail}}"
 					]
 				},
 				"description": "Set"
@@ -462,10 +661,6 @@
 				"id": "78887997-0d69-4b6f-ba91-4500a7f7d0e5",
 				"type": "text/javascript",
 				"exec": [
-					"pm.test(\"Status code is OK\", () => {",
-					"    pm.response.to.be.ok;",
-					"});",
-					"",
 					"pm.test(\"Response time is less than 10s\", () => {",
 					"    pm.expect(pm.response.responseTime).to.be.below(10000);",
 					"});"

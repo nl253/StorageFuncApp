@@ -32,7 +32,7 @@
     }
   ],
   "paths": {
-    "/get/{key}": {
+    "/{key}": {
       "get": {
         "description": "Get",
         "operationId": "get-get",
@@ -55,7 +55,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/Text"
+            "$ref": "#/responses/Any"
           },
           "400": {
             "$ref": "#/responses/Error"
@@ -74,9 +74,7 @@
           "application/json",
           "text/plain"
         ]
-      }
-    },
-    "/set/{key}": {
+      },
       "post": {
         "description": "Set",
         "operationId": "post-set",
@@ -87,6 +85,14 @@
           "blob"
         ],
         "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "type": "string",
+            "enum": ["sync", "async"]
+          },
           {
             "name": "key",
             "in": "path",
@@ -133,9 +139,28 @@
     }
   },
   "responses": {
+    "Any": {
+      "examples": {
+        "text/plain": "123123",
+        "application/json": {
+          "firstName": "Amy",
+          "lastName": "Smith"
+        }
+      },
+      "headers": {
+        "Content-Type": {
+          "type": "string",
+          "enum": ["text/plain", "application/json"]
+        }
+      },
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Any"
+      }
+    },
     "Text": {
       "examples": {
-        "text/plain": "alslkedfj alsdfaslkd falskdf kasdf "
+        "text/plain": "\"data\" saved"
       },
       "headers": {
         "Content-Type": {
@@ -151,7 +176,7 @@
     "Error": {
       "description": "",
       "examples": {
-        "200": "something went wrong"
+        "text/plain": "something went wrong"
       },
       "schema": {
         "$ref": "#/definitions/Error"
@@ -171,6 +196,7 @@
       "type": "string",
       "title": "Error Response"
     },
+    "Any": {},
     "Text": {
       "type": "string",
       "minLength": 1,

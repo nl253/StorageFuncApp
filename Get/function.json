@@ -3,7 +3,7 @@
   "bindings": [
     {
       "authLevel": "function",
-      "route": "get/{key}",
+      "route": "{key}",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",

@@ -6,16 +6,30 @@ import {
   StorageRetryPolicyType,
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
-import * as Ajv from "ajv";
+
+type StatusOk = 200 | 201 | 202;
+type StatusError = 400 | 401 | 404;
 
 type Headers = Record<string, string>;
-type Response = any;
+type TypedHeader<K extends string> = Headers & { "content-type": K };
+type Json = boolean | null | string | number | Record<string, JSON> | Json[];
 
-const JSON_HEADER = {
+interface IHttpResponse<T, S extends number, H extends string> {
+  body: T;
+  status: S;
+  isRaw: true;
+  headers: TypedHeader<H>;
+}
+
+type IHttpTextResponse = IHttpResponse<string, StatusOk, "text/plain">;
+type IHttpJsonResponse<T extends Json = Json> = IHttpResponse<T, StatusOk, "application/json">;
+type IHttpFailure = IHttpResponse<string, StatusError, "text/plain">;
+
+const JSON_HEADER: TypedHeader<"application/json"> = {
   "content-type": "application/json",
 };
 
-const TEXT_HEADER = {
+const TEXT_HEADER: TypedHeader<"text/plain"> = {
   "content-type": "text/plain",
 };
 
@@ -23,78 +37,62 @@ const CACHE_HEADER = {
   "cache-control": "private, immutable",
 };
 
-const HTTP_ERR = {
-  USER_ERR: 400,
-  NOT_FOUND_ERR: 404,
-};
-
 class APIError extends Error {
-  public readonly code: number;
+  public static from(error: Error, code: StatusError = 400): APIError {
+    // @ts-ignore
+    const status = error.code || error.status || error.statusCode || code;
+    return new APIError(error.message, status);
+  }
 
-  constructor(msg: string = "something went wrong", code: number = HTTP_ERR.USER_ERR) {
+  public readonly code: StatusError;
+
+  protected constructor(msg: string = "something went wrong", code: StatusError) {
     super(msg);
     this.code = code;
   }
 }
 
 const logStart = (context: Context): void => {
-  context.log("[Node.js HTTP %s FuncApp] %s", context.req.method, context.req.url);
+  context.log("%s %s", context.req.method, context.req.url);
   context.log("binding data", context.bindingData ? JSON.stringify(context.bindingData).substr(0, 200) : "undefined");
   context.log("body %s", context.req.body ? JSON.stringify(context.req.body).substr(0, 200) : "undefined");
-  context.log("query %s", JSON.stringify(context.req.query).substr(0, 200));
+  context.log("query %s", context.req.query ? JSON.stringify(context.req.query).substr(0, 200) : "undefined");
 };
 
-const makeLogger = (context: Context) => ({
-  log(...xs: any[]): void {
-    return context.log(...xs);
-  },
-  warn(...xs: any[]): void {
-    return context.log.warn(...xs);
-  },
-  error(...xs: any[]): void {
-    return context.log.error(...xs);
-  },
-});
-
-const succeed = (context: Context, body: Response, headers: Headers = { ...CACHE_HEADER, ...JSON_HEADER }, status: number = 200): Response => {
+const succeedJson = <T extends Json>(context: Context, body: T, headers: Headers = {...CACHE_HEADER}, status: StatusOk = 200): IHttpJsonResponse<T> => {
   return context.res = {
     body,
-    status,
-    isRaw: true,
-    headers,
+    status: status as 200,
+    isRaw: true as true,
+    headers: {
+      ...headers,
+      ...JSON_HEADER,
+    },
   };
 };
 
-const fail = (context: Context, msg: string, status: number = 400, headers: Headers = { ...TEXT_HEADER }): Response => {
+const succeedText = (context: Context, body: string, headers: Headers = {...CACHE_HEADER}, status: StatusOk = 200): IHttpTextResponse => {
   return context.res = {
-    status,
-    headers,
-    body: msg,
+    body,
+    status: status as 200,
+    isRaw: true as true,
+    headers: {
+      ...headers,
+      ...TEXT_HEADER,
+    },
   };
 };
 
-const validateJSON = (context: Context, schema: Record<string, any>, what: "body" | "query" = "body"): void => {
-  if (context.req[what] === null || context.req[what] === undefined) {
-    throw new APIError(`${what} is missing from the request`, HTTP_ERR.USER_ERR);
-  }
-  const validate = new Ajv({
-    messages: true,
-    verbose: true,
-    allErrors: true,
-    unicode: false,
-    logger: makeLogger(context),
-  }).compile({
-    $schema: "http://json-schema.org/draft-07/schema#",
-    $id: schema.$id || schema.description,
-    description: schema.description || schema.$id,
-    ...schema,
-  });
-  const valid = validate(context.req[what]);
-  if (!valid) {
-    context.log(validate);
-    context.log(validate.errors[0].params);
-    throw new APIError(validate.errors.map((e) => `${e.dataPath} ${e.message} ${e.params ? JSON.stringify(e.params) : ""}`).join(", "), HTTP_ERR.USER_ERR);
-  }
+const fail = (context: Context, error: APIError, headers: Headers = {}): IHttpFailure => {
+  return context.res = {
+    status: error.code,
+    headers: {
+      ...headers,
+      ...TEXT_HEADER,
+    },
+    isRaw: true as true,
+    body: error.message,
+  };
 };
 
 const getBlobContainer = async (containerName: string): Promise<ContainerClient> => {
@@ -121,6 +119,26 @@ const getBlobContainer = async (containerName: string): Promise<ContainerClient>
   return container;
 };
 
+const getBlob = async (key: string, containerName: string): Promise<{ res: string, headers: Headers }> => {
+  const container = await getBlobContainer(containerName);
+  const blob = container.getBlockBlobClient(key);
+  const propertiesPromise = blob.getProperties();
+  const res = await blob.download(0, undefined, {maxRetryRequests: 3});
+  const resString = streamToString(res.readableStreamBody);
+  const properties = await propertiesPromise;
+  const headers = {
+    "content-disposition": properties.contentDisposition,
+    "cache-control": properties.cacheControl,
+    "content-encoding": properties.contentEncoding,
+    "content-language": properties.contentLanguage,
+    "content-type": properties.contentType,
+  } as Headers;
+  return {
+    headers,
+    res: await resString,
+  };
+};
+
 const streamToString: (readonly: any) => Promise<string> = (readableStream) => new Promise((resolve, reject) => {
   const chunks = [];
   readableStream.on("data", (data) => chunks.push(data.toString()));
@@ -130,16 +148,19 @@ const streamToString: (readonly: any) => Promise<string> = (readableStream) => n
 
 export {
   Headers,
-  Response,
-  HTTP_ERR,
   TEXT_HEADER,
   JSON_HEADER,
   CACHE_HEADER,
   logStart,
   fail,
-  succeed,
-  validateJSON,
+  succeedJson,
+  succeedText,
   APIError,
   getBlobContainer,
   streamToString,
+  getBlob,
+  Json,
+  IHttpFailure,
+  IHttpJsonResponse,
+  IHttpTextResponse,
 };

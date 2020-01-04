@@ -1,18 +1,18 @@
+import {Context, HttpRequest} from "@azure/functions";
+import {BlockBlobTier} from "@azure/storage-blob";
+
 import {
+  APIError,
   fail,
   getBlobContainer,
   Headers,
+  IHttpFailure,
+  IHttpTextResponse,
   logStart,
-  Response,
-  succeed,
-  TEXT_HEADER,
+  succeedText,
 } from "../lib";
 
-import {BlockBlobTier} from "@azure/storage-blob";
-
-import {Context, HttpRequest} from "@azure/functions";
-
-const setBlob = async (key: string, val: any, containerName: string, headers: Headers = {}): Promise<void> => {
+const setBlob = async (key: string, val: string, containerName: string, headers: Headers): Promise<void> => {
   const container = getBlobContainer(containerName);
   const blobHTTPHeaders = {
     blobCacheControl: headers["cache-control"],
@@ -28,14 +28,18 @@ const setBlob = async (key: string, val: any, containerName: string, headers: He
   await (await container).uploadBlockBlob(key, val, val.length, options);
 };
 
-export default async (context: Context, req: HttpRequest): Promise<Response> => {
+export default async (context: Context, req: HttpRequest): Promise<IHttpTextResponse | IHttpFailure> => {
   logStart(context);
   try {
-    const containerName = context.req.headers.authorization || context.req.headers.Authorization;
     const {key} = context.bindingData;
-    await setBlob(key, req.rawBody, containerName, req.headers);
-    return succeed(context, `"${key}" saved`, {...TEXT_HEADER});
+    const job = setBlob(key, req.rawBody, context.req.headers.authorization, req.headers as Headers);
+    const contentType = req.headers["content-type"] || "text/plain";
+    const msg = `"${key}" saved, ${req.rawBody.length} bytes, content type ${contentType}`;
+    if (req.query.mode === "sync") {
+      await job;
+    }
+    return succeedText(context, msg);
   } catch (e) {
-    return fail(context, e.message, e.code);
+    return fail(context, APIError.from(e));
   }
 };
