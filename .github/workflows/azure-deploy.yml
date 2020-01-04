@@ -21,8 +21,10 @@ jobs:
       run: f() { for i in *.json; do npx jsonlint "$i" || return 1; done; }; f
     - name: Lint Code
       run: npm run lint:code
+    - name: Lint Docs
+      shell: bash
+      run: npm run lint:doc
     - name: Audit NPM Packages
-      if: matrix.node >= 10
       run: npm audit
     - name: Lint Dependencies
       shell: bash
