@@ -44,7 +44,7 @@
   },
   "engineStrict": true,
   "dependencies": {
-    "@azure/storage-blob": "^12.0.1"
+    "@azure/storage-blob": "^12.13.0"
   },
   "devDependencies": {
     "@azure/functions": "^1.0.3",
