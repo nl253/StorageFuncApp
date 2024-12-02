@@ -44,7 +44,8 @@
   },
   "engineStrict": true,
   "dependencies": {
-    "@azure/storage-blob": "^12.0.1"
+    "@azure/storage-blob": "^12.0.1",
+    "snyk": "^1.319.0"
   },
   "devDependencies": {
     "@azure/functions": "^1.0.3",
@@ -110,6 +111,9 @@
     "lint:deps": "bash -c \"npm run lint:deps:license && npm run lint:deps:security\"",
     "lint:deps:security": "npx retire --node --package",
     "lint:deps:license": "npx license-checker --summary",
-    "loc": "bash -c \"tokei -- $(git ls-files | grep -v docs | grep -v bin)\""
-  }
+    "loc": "bash -c \"tokei -- $(git ls-files | grep -v docs | grep -v bin)\"",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
+  },
+  "snyk": true
 }
