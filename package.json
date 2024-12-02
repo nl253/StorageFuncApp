@@ -51,7 +51,7 @@
     "@types/license-checker": "^25.0.0",
     "@types/node": "^13.1.4",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
-    "@typescript-eslint/parser": "^2.9.0",
+    "@typescript-eslint/parser": "^2.15.0",
     "eslint": "^6.7.1",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-filenames": "^1.3.2",
